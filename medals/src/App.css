@@ -1,0 +1,15 @@
+.App {
+  text-align: center;
+  background-color: #61dafb;
+}
+
+.Country, .Gold{
+  font-family: Arial, Helvetica, sans-serif;
+  margin-top: 15px;
+}
+
+.Gold{
+  display: flex;
+  flex-wrap:nowrap;
+  justify-content: space-evenly;
+}
