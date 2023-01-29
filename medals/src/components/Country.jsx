@@ -6,26 +6,11 @@ import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import { yellow } from "@mui/material/colors";
 
 class Country extends Component {
-    state = {
-        name: this.props.name,
-        goldMedalCount: this.props.goldMedalCount,
-    }
-
-    handleAdd = () => {
-        // checking current gold count before adding 1
-        // console.log(this.state.gold);
-
-        // adding one to the current gold count
-        this.setState({ goldMedalCount: this.state.goldMedalCount + 1 });
-    }
-
-    handleMinus = () =>{
-        // checking if function is connected to button
-        // console.log("minus");
-
-        // minus 1 from gold medal count
-        this.setState({ goldMedalCount: this.state.goldMedalCount - 1})
-    }
+    // Removed and using props encapsulation
+    // state = {
+    //     name: this.props.country.name,
+    //     goldMedalCount: this.props.country.goldMedalCount,
+    // }
 
     render() {
         const myStyle = {
@@ -33,18 +18,19 @@ class Country extends Component {
             height: "150px",
         }
 
+        // changed all this.state to this.props.country to display from props
         return (
             <Card variant="outlined" style={myStyle} >
                 <div className='Country'>
                     <div style={{}}>
-                        <strong>{this.state.name}</strong>
+                        <strong>{this.props.country.name}</strong>
                     </div>
                     <Divider />
                     <div className="Gold">
                         Gold Medals
-                        <Avatar sx={{ bgcolor: yellow[700], width: 50, height: 50 }} ><WorkspacePremiumIcon />{this.state.goldMedalCount}</Avatar> 
-                        <Fab color="success" size="medium" onClick={this.handleAdd}><AddIcon /></Fab>
-                        <Fab color="error" size="medium" onClick={this.handleMinus} disabled={this.state.goldMedalCount === 0 ? true: false}><RemoveIcon /></Fab>
+                        <Avatar sx={{ bgcolor: yellow[700], width: 50, height: 50 }} ><WorkspacePremiumIcon />{this.props.country.goldMedalCount}</Avatar> 
+                        <Fab color="success" size="medium" onClick={() => this.props.onAdd(this.props.country.id)}><AddIcon /></Fab>
+                        <Fab color="error" size="medium" onClick={() => this.props.onMinus(this.props.country.id)} disabled={this.props.country.goldMedalCount === 0 ? true: false}><RemoveIcon /></Fab>
                         
                     </div>
                 </div>

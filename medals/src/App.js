@@ -12,6 +12,51 @@ class App extends Component {
     ]
   }
 
+  handleAdd = (countryId) => {
+    // checking if function is connected to button
+    // console.log(`Add to: ${countryId}`);
+
+    let foundIndex = this.state.countries.findIndex(obj => obj.id === countryId);
+
+    // checking the index associated with the countryId 
+    // console.log(foundIndex);
+ 
+    // creating a dummy copy to later assign to the current array
+    let newArr = this.state.countries;
+
+    newArr[foundIndex].goldMedalCount++;
+
+    // checking how the newArr looks
+    // console.log(newArr);
+
+    // set the old countries array to newArr
+    this.setState({countries: newArr});
+
+    // checking to see how the modified state looks like
+    // console.log(this.state.countries);
+}
+
+handleMinus = (countryId) =>{
+    // checking if function is connected to button
+    // console.log(`minus from: ${countryId}`);
+
+    let foundIndex = this.state.countries.findIndex(obj => obj.id === countryId);
+    
+    // checking the index associated with the countryId   
+    // console.log(foundIndex);
+ 
+    // creating a dummy copy to later assign to the current array
+    let newArr = this.state.countries;
+
+    newArr[foundIndex].goldMedalCount--;
+
+    // set the old countries array to newArr
+    this.setState({countries: newArr});
+
+}
+
+
+
   render(){
     console.log(this.props)
     return (
@@ -24,8 +69,12 @@ class App extends Component {
         { this.state.countries.map(country => 
         <Country
           key={ country.id}
-          name= {country.name}
-          goldMedalCount={ country.goldMedalCount}
+          // id= { country.id }
+          country= {country}
+          onAdd={ this.handleAdd }
+          onMinus={ this.handleMinus }
+          // name= {country.name}
+          // goldMedalCount={ country.goldMedalCount}
         />) }
       </div>
     );
