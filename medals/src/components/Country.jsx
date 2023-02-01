@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Card, Divider } from "@mui/material";
+import { Card, Divider, Button, Badge } from "@mui/material";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import Medal from "./Medal";
 
 class Country extends Component {
@@ -11,44 +12,51 @@ class Country extends Component {
             padding: "5px"
         }
 
-        const { id, name, gold, silver, bronze, onAdd, onMinus } = this.props;
+        const { id, name, gold, silver, bronze, onAdd, onMinus, onStripMedals } = this.props;
 
-        // changed all this.props to use the consts defined above
         return (
             <Card variant="outlined" style={myStyle} >
 
                 <div className='Country'>
                     <div style={{}}>
-                        <strong>{name}</strong>
+                        <Badge
+                            badgeContent={gold + silver + bronze}
+                            color="primary"
+                            showZero
+                        >
+                            <strong>{name} <EmojiEventsIcon /></strong>
+                        </Badge>
                     </div>
                     <Divider />
                     <Medal
                         id={id}
-                        medalCount = {gold}
-                        medalType = {"gold"}
+                        medalCount={gold}
+                        medalType={"Gold"}
+                        medalColor={"gold"}
                         onAdd={onAdd}
                         onMinus={onMinus}
                     />
                     <Medal
                         id={id}
-                        medalCount = {silver}
-                        medalType = {"silver"}
+                        medalCount={silver}
+                        medalType={"Silver"}
+                        medalColor={"#adb5bd"}
                         onAdd={onAdd}
                         onMinus={onMinus}
                     />
                     <Medal
                         id={id}
-                        medalCount = {bronze}
-                        medalType = {"cb8c47"}
+                        medalCount={bronze}
+                        medalType={"Bronze"}
+                        medalColor={"#cb8c47"}
                         onAdd={onAdd}
                         onMinus={onMinus}
                     />
-                   
-
+                    <Divider />
+                    <div className="Medals">
+                    <Button variant="contained" color="error" size="medium" onClick={() => onStripMedals(id)}>Strip Country of all Medals</Button>
+                    </div>
                 </div>
-                {/* for bronze <Medal name={name} /> */}
-                {/* something similar how we are passing Country component */}
-
             </Card>
         );
     }

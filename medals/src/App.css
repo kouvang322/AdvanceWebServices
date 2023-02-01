@@ -16,6 +16,7 @@
 .Country, .Medals{
   font-family: Arial, Helvetica, sans-serif;
   margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .Medals{

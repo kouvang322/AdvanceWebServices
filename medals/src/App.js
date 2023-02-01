@@ -1,4 +1,5 @@
 // import logo from './logo.svg';
+import { Badge } from '@mui/material';
 import { Component } from 'react';
 import './App.css';
 import Country from './components/Country';
@@ -6,80 +7,87 @@ import Country from './components/Country';
 class App extends Component {
   state = {
     countries: [
-      { id: 1, name: 'United States', gold: 2, silver: 2, bronze: 3},
-      { id: 2, name: 'China', gold: 3, silver: 1, bronze: 0},
-      { id: 3, name: 'Germany', gold: 0, silver: 2, bronze: 2},
+      { id: 1, name: 'United States', gold: 2, silver: 2, bronze: 3 },
+      { id: 2, name: 'China', gold: 3, silver: 1, bronze: 0 },
+      { id: 3, name: 'Germany', gold: 0, silver: 2, bronze: 2 },
     ],
-    countries2: [
-      { id: 4, name: 'Japan', 
-      medals: [
-        {gold: 0, metalType: "gold"}, 
-        {silver: 2, metalType: "silver"}, 
-        {bronze: 2, metalType: "bronze"}
-      ]},
-      { id: 5, name: 'Korea', 
-      medals: [
-        {gold: 1, metalType: "gold"}, 
-        {silver: 4, metalType: "silver"}, 
-        {bronze: 6, metalType: "bronze"}
-      ]},
-      { id: 6, name: 'Thailand', 
-      medals: [
-        {gold: 5, metalType: "gold"}, 
-        {silver: 3, metalType: "silver"}, 
-        {bronze: 2, metalType: "bronze"}
-      ]},
-    ]
+    totalMedalsCount: 0,
   }
 
-  handleAdd = (countryId) => {
-    // checking if function is connected to button
-    // console.log(`Add to: ${countryId}`);
-
-    let foundIndex = this.state.countries.findIndex(country => country.id === countryId);
-
-    // checking the index associated with the countryId 
-    // console.log(foundIndex);
-
-    // creating a dummy copy to later assign to the current array
-    let newArr = this.state.countries;
-
-    newArr[foundIndex].gold++;
-
-    // checking how the newArr looks
-    // console.log(newArr);
-
-    // set the old countries array to newArr
-    this.setState({ countries: newArr });
-
-    // checking to see how the modified state looks like
-    // console.log(this.state.countries);
+  componentDidMount() {
+    this.calcAllCountriesMedals();
   }
 
-  handleMinus = (countryId) => {
-    // checking if function is connected to button
-    // console.log(`minus from: ${countryId}`);
+  handleAdd = (countryId, medalType) => {
 
-    let foundIndex = this.state.countries.findIndex(country => country.id === countryId);
+    const countriesArrCopy = this.state.countries;
 
-    // checking the index associated with the countryId   
-    // console.log(foundIndex);
+    let countryIndex = this.state.countries.findIndex(country => country.id === countryId);
 
-    // creating a dummy copy to later assign to the current array
-    let newArr = this.state.countries;
+    switch (medalType) {
+      case "Gold":
+        countriesArrCopy[countryIndex].gold++;
+        break;
+      case "Silver":
+        countriesArrCopy[countryIndex].silver++;
+        break;
+      case "Bronze":
+        countriesArrCopy[countryIndex].bronze++;
+        break;
+      default:
+        console.log("Medals didn't change");
+    }
 
-    newArr[foundIndex].gold--;
-
-    // set the old countries array to newArr
-    this.setState({ countries: newArr });
+    this.setState({ countries: countriesArrCopy });
+    this.calcAllCountriesMedals();
 
   }
 
-  // in class to not have so many methods
-  // increaseMedalCount = (countryId, medalName) => {
-  //   // which country should I increase & which type of medal
+  handleMinus = (countryId, medalType) => {
+    const countriesArrCopy = this.state.countries;
 
-  // }
+    let countryIndex = this.state.countries.findIndex(country => country.id === countryId);
+
+    switch (medalType) {
+      case "Gold":
+        countriesArrCopy[countryIndex].gold--;
+        break;
+      case "Silver":
+        countriesArrCopy[countryIndex].silver--;
+        break;
+      case "Bronze":
+        countriesArrCopy[countryIndex].bronze--;
+        break;
+      default:
+        console.log("Medals didn't change");
+    }
+
+    this.setState({ countries: countriesArrCopy });
+    this.calcAllCountriesMedals();
+
+  }
+
+  calcAllCountriesMedals = () => {
+    let allCountriesMedals = 0;
+    this.state.countries.forEach(country => {
+      allCountriesMedals += (country.gold + country.silver + country.bronze);
+    })
+    this.setState({ totalMedalsCount: allCountriesMedals });
+  }
+
+  stripAllMedals = (countryId) => {
+    const countriesArrCopy = [...this.state.countries];
+
+    let countryLocated = countriesArrCopy.findIndex(country => country.id === countryId);
+
+    countriesArrCopy[countryLocated].gold = 0;
+    countriesArrCopy[countryLocated].silver = 0;
+    countriesArrCopy[countryLocated].bronze = 0;
+
+   this.setState({countries: countriesArrCopy});
+   this.calcAllCountriesMedals();
+    
+  }
 
   render() {
     // console.log(this.props)
@@ -91,9 +99,13 @@ class App extends Component {
       }}>
         <div className='AppHeader'>
           <h2>
-            <strong>
-              Olympic Medals
-            </strong>
+            <Badge badgeContent={this.state.totalMedalsCount}
+              color="primary"
+              showZero>
+              <strong>
+                Olympic Medals
+              </strong>
+            </Badge>
           </h2>
         </div>
 
@@ -106,16 +118,15 @@ class App extends Component {
 
           {this.state.countries.map(country =>
             <Country
-              key = {country.id}
-              id= { country.id }
-              name = {country.name}
-              gold = { country.gold}
-              silver = { country.silver}
-              bronze = { country.bronze}
+              key={country.id}
+              id={country.id}
+              name={country.name}
+              gold={country.gold}
+              silver={country.silver}
+              bronze={country.bronze}
               onAdd={this.handleAdd}
               onMinus={this.handleMinus}
-              // country={country}
-              // onIncrease = {this.increaseMedalCount}
+              onStripMedals={this.stripAllMedals}
             />)}
         </div>
 
