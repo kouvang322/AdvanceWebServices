@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Card, Divider, Button, Badge } from "@mui/material";
+import { Card, Divider, Button, Badge, IconButton } from "@mui/material";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import Medal from "./Medal";
+import { Delete } from "@mui/icons-material";
 
 class Country extends Component {
 
@@ -12,13 +13,13 @@ class Country extends Component {
             padding: "5px"
         }
 
-        const { id, name, gold, silver, bronze, onAdd, onMinus, onStripMedals } = this.props;
+        const { id, name, gold, silver, bronze, onAdd, onMinus, onStripMedals, onDeleteCountry } = this.props;
 
         return (
             <Card variant="outlined" style={myStyle} >
 
                 <div className='Country'>
-                    <div style={{}}>
+                    <div className="Country-Title">
                         <Badge
                             badgeContent={gold + silver + bronze}
                             color="primary"
@@ -26,6 +27,7 @@ class Country extends Component {
                         >
                             <strong>{name} <EmojiEventsIcon /></strong>
                         </Badge>
+                            <IconButton color="error" size="small" onClick={() => onDeleteCountry(id)}><Delete /></IconButton>
                     </div>
                     <Divider />
                     <Medal

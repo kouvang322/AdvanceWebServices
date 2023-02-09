@@ -3,6 +3,7 @@ import { Badge } from '@mui/material';
 import { Component } from 'react';
 import './App.css';
 import Country from './components/Country';
+import NewCountry from './components/NewCountry';
 
 class App extends Component {
   state = {
@@ -67,6 +68,7 @@ class App extends Component {
 
   }
 
+
   calcAllCountriesMedals = () => {
     let allCountriesMedals = 0;
     this.state.countries.forEach(country => {
@@ -87,6 +89,25 @@ class App extends Component {
    this.setState({countries: countriesArrCopy});
    this.calcAllCountriesMedals();
     
+  }
+
+  handleAddCountry = (newCountryName) => {
+    const countriesArrCopy = this.state.countries;
+    const foundExistingCountry = countriesArrCopy.find(country => country.name.toUpperCase() === newCountryName.toUpperCase());
+
+    if(foundExistingCountry == null){
+      const id = countriesArrCopy.length === 0 ? 1 : Math.max(...countriesArrCopy.map(countriesArrCopy => countriesArrCopy.id)) + 1;
+      const mutableCountriesArr = countriesArrCopy.concat({id: id, name: newCountryName, gold: 0, silver: 0, bronze: 0});
+      this.setState({countries: mutableCountriesArr});
+    }
+    else{
+        alert("Country already exists. Enter a new country.");
+    }
+  }
+
+  handleDeleteCountry = (countryId) => {
+    const countries = this.state.countries.filter(country => country.id !== countryId);
+    this.setState({countries: countries});
   }
 
   render() {
@@ -127,9 +148,10 @@ class App extends Component {
               onAdd={this.handleAdd}
               onMinus={this.handleMinus}
               onStripMedals={this.stripAllMedals}
+              onDeleteCountry={this.handleDeleteCountry}
             />)}
         </div>
-
+          <NewCountry onAddCountry = {this.handleAddCountry}/>
       </div>
     );
   }
