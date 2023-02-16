@@ -21,11 +21,12 @@ const App = () => {
 
   useEffect(() => {
     calcAllCountriesMedals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countries])
 
 
   const handleAdd = (countryId, medalType) => {
-
+    
     let countryIndex = countries.findIndex(country => country.id === countryId);
 
     switch (medalType) {
