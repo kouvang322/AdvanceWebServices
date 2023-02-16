@@ -1,19 +1,18 @@
-import React, { Component } from "react";
+// import React, { Component } from "react";
 import { Card, Divider, Button, Badge, IconButton } from "@mui/material";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import Medal from "./Medal";
 import { Delete } from "@mui/icons-material";
 
-class Country extends Component {
+const Country = (props) => {
 
-    render() {
         const myStyle = {
             width: "300px",
             height: "100%",
             padding: "5px"
         }
 
-        const { id, name, gold, silver, bronze, onAdd, onMinus, onStripMedals, onDeleteCountry } = this.props;
+        const { id, name, gold, silver, bronze, onAdd, onMinus, onStripMedals, onDeleteCountry } = props;
 
         return (
             <Card variant="outlined" style={myStyle} >
@@ -61,7 +60,6 @@ class Country extends Component {
                 </div>
             </Card>
         );
-    }
 }
 
-export default Country
+export default Country;

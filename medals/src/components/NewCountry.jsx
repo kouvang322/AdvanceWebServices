@@ -1,40 +1,37 @@
+import React, {useState, useEffect} from "react";
+// import React, {Component} from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Fab, TextField } from "@mui/material";
-import { Component } from "react";
 import AddIcon from '@mui/icons-material/Add';
 
-class NewCountry extends Component {
-    state = {
-        openDialog: false,
-        countryName: '',
+
+const NewCountry = (props) => {
+
+    const [showForm, setShowForm ] = useState(false);
+    const [countryName, setCountryName] = useState('');
+
+    useEffect(() => {
+        setCountryName('');
+    }, [showForm]);
+
+
+    const handleOpen = () => {
+        setShowForm(true);
     }
 
-    handleOpen = () => {
-        this.setState({ openDialog: true });
+    const handleClose = () => {
+        setShowForm(false);
+        setCountryName('');
     }
 
-    handleClose = () => {
-        this.setState({ openDialog: false });
-        this.setState({countryName: ''});
+    const saveNewCountry = () => {
+        props.onAddCountry(countryName);
+        handleClose();
     }
 
-    handleChange = (e) => this.setState({ [e.target.name]: e.target.value });
-
-    saveNewCountry = () => {
-        const countryName = this.state.countryName;
-        this.props.onAddCountry(countryName);
-        this.handleClose();
-    }
-
-    handleNameChange = () => {
-        console.log("add");
-    }
-
-    render() {
-        const { openDialog, countryName } = this.state;
         return (
             <div className="New-Country">
-                <Fab variant="contained" color="success" onClick={this.handleOpen}><AddIcon /></Fab>
-                <Dialog open={openDialog} onClose={this.handleClose}>
+                <Fab variant="contained" color="success" onClick={handleOpen}><AddIcon /></Fab>
+                <Dialog open={showForm} onClose={handleClose}>
                     <DialogTitle><b>Add Country</b></DialogTitle>
                     <DialogContent>
                         <DialogContentText>
@@ -47,22 +44,20 @@ class NewCountry extends Component {
                             label="Country Name"
                             type="text"
                             value={countryName}
-                            onChange={this.handleChange}
+                            onChange={(e) => setCountryName(e.target.value)}
                             fullWidth
                             variant="standard"
                             autoFocus
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleClose}>Cancel</Button>
-                        <Button variant="contained" onClick={this.saveNewCountry} disabled={countryName.trim().length === 0 || countryName.match((/^\s*$/))}>Add Country</Button>
+                        <Button onClick={handleClose}>Cancel</Button>
+                        <Button variant="contained" onClick={saveNewCountry} disabled={countryName.trim().length === 0 || countryName.match((/^\s*$/))}>Add Country</Button>
                     </DialogActions>
                 </Dialog>
 
             </div>
         );
-    }
-
 }
 
-export default NewCountry
+export default NewCountry;

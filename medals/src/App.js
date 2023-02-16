@@ -1,117 +1,113 @@
-// import logo from './logo.svg';
+// import { Component } from 'react';
+import React, {useState, useEffect} from 'react';
 import { Badge } from '@mui/material';
-import { Component } from 'react';
 import './App.css';
 import Country from './components/Country';
 import NewCountry from './components/NewCountry';
 
-class App extends Component {
-  state = {
-    countries: [
+const App = () => {
+
+  const [countries, setCountries] = useState([]);
+  const [totalMedalsCount, setTotalMedalsCount] = useState(0);
+
+  useEffect(() => {
+    let fetchedCountries = [
       { id: 1, name: 'United States', gold: 2, silver: 2, bronze: 3 },
       { id: 2, name: 'China', gold: 3, silver: 1, bronze: 0 },
       { id: 3, name: 'Germany', gold: 0, silver: 2, bronze: 2 },
-    ],
-    totalMedalsCount: 0,
-  }
+    ]
+    setCountries(fetchedCountries);
+  }, []);
 
-  componentDidMount() {
-    this.calcAllCountriesMedals();
-  }
+  useEffect(() => {
+    calcAllCountriesMedals();
+  }, [countries])
 
-  handleAdd = (countryId, medalType) => {
 
-    const countriesArrCopy = this.state.countries;
+  const handleAdd = (countryId, medalType) => {
 
-    let countryIndex = this.state.countries.findIndex(country => country.id === countryId);
+    let countryIndex = countries.findIndex(country => country.id === countryId);
 
     switch (medalType) {
       case "Gold":
-        countriesArrCopy[countryIndex].gold++;
+        countries[countryIndex].gold++;
         break;
       case "Silver":
-        countriesArrCopy[countryIndex].silver++;
+        countries[countryIndex].silver++;
         break;
       case "Bronze":
-        countriesArrCopy[countryIndex].bronze++;
+        countries[countryIndex].bronze++;
         break;
       default:
         console.log("Medals didn't change");
     }
 
-    this.setState({ countries: countriesArrCopy });
-    this.calcAllCountriesMedals();
+    setCountries(countries);
+    calcAllCountriesMedals();
 
   }
 
-  handleMinus = (countryId, medalType) => {
-    const countriesArrCopy = this.state.countries;
+  const handleMinus = (countryId, medalType) => {
 
-    let countryIndex = this.state.countries.findIndex(country => country.id === countryId);
+    let countryIndex = countries.findIndex(country => country.id === countryId);
 
     switch (medalType) {
       case "Gold":
-        countriesArrCopy[countryIndex].gold--;
+        countries[countryIndex].gold--;
         break;
       case "Silver":
-        countriesArrCopy[countryIndex].silver--;
+        countries[countryIndex].silver--;
         break;
       case "Bronze":
-        countriesArrCopy[countryIndex].bronze--;
+        countries[countryIndex].bronze--;
         break;
       default:
         console.log("Medals didn't change");
     }
 
-    this.setState({ countries: countriesArrCopy });
-    this.calcAllCountriesMedals();
-
+    setCountries(countries);
+    calcAllCountriesMedals();
   }
 
 
-  calcAllCountriesMedals = () => {
+  const calcAllCountriesMedals = () => {
     let allCountriesMedals = 0;
-    this.state.countries.forEach(country => {
+    countries.forEach(country => {
       allCountriesMedals += (country.gold + country.silver + country.bronze);
     })
-    this.setState({ totalMedalsCount: allCountriesMedals });
+    setTotalMedalsCount(allCountriesMedals);
   }
 
-  stripAllMedals = (countryId) => {
-    const countriesArrCopy = [...this.state.countries];
+  const stripAllMedals = (countryId) => {
 
-    let countryLocated = countriesArrCopy.findIndex(country => country.id === countryId);
+    let countryLocated = countries.findIndex(country => country.id === countryId);
 
-    countriesArrCopy[countryLocated].gold = 0;
-    countriesArrCopy[countryLocated].silver = 0;
-    countriesArrCopy[countryLocated].bronze = 0;
+    countries[countryLocated].gold = 0;
+    countries[countryLocated].silver = 0;
+    countries[countryLocated].bronze = 0;
 
-   this.setState({countries: countriesArrCopy});
-   this.calcAllCountriesMedals();
+   setCountries(countries);
+   calcAllCountriesMedals();
     
   }
 
-  handleAddCountry = (newCountryName) => {
-    const countriesArrCopy = this.state.countries;
-    const foundExistingCountry = countriesArrCopy.find(country => country.name.toUpperCase() === newCountryName.toUpperCase());
+  const handleAddCountry = (newCountryName) => {
+    const foundExistingCountry = countries.find(country => country.name.toUpperCase() === newCountryName.toUpperCase());
 
     if(foundExistingCountry == null){
-      const id = countriesArrCopy.length === 0 ? 1 : Math.max(...countriesArrCopy.map(countriesArrCopy => countriesArrCopy.id)) + 1;
-      const mutableCountriesArr = countriesArrCopy.concat({id: id, name: newCountryName, gold: 0, silver: 0, bronze: 0});
-      this.setState({countries: mutableCountriesArr});
+      const id = countries.length === 0 ? 1 : Math.max(...countries.map(countries => countries.id)) + 1;
+      setCountries(countries.concat({id: id, name: newCountryName, gold: 0, silver: 0, bronze: 0}));
     }
     else{
         alert("Country already exists. Enter a new country.");
     }
   }
 
-  handleDeleteCountry = (countryId) => {
-    const countries = this.state.countries.filter(country => country.id !== countryId);
-    this.setState({countries: countries});
+  const handleDeleteCountry = (countryId) => {
+    const countriesAfterDelete = countries.filter(country => country.id !== countryId);
+    setCountries(countriesAfterDelete);
   }
 
-  render() {
-    // console.log(this.props)
     return (
       <div className="App" style={{
         display: 'block',
@@ -120,7 +116,7 @@ class App extends Component {
       }}>
         <div className='AppHeader'>
           <h2>
-            <Badge badgeContent={this.state.totalMedalsCount}
+            <Badge badgeContent={totalMedalsCount}
               color="primary"
               showZero>
               <strong>
@@ -137,7 +133,7 @@ class App extends Component {
           }
         }>
 
-          {this.state.countries.map(country =>
+          {countries.map(country =>
             <Country
               key={country.id}
               id={country.id}
@@ -145,16 +141,15 @@ class App extends Component {
               gold={country.gold}
               silver={country.silver}
               bronze={country.bronze}
-              onAdd={this.handleAdd}
-              onMinus={this.handleMinus}
-              onStripMedals={this.stripAllMedals}
-              onDeleteCountry={this.handleDeleteCountry}
+              onAdd={handleAdd}
+              onMinus={handleMinus}
+              onStripMedals={stripAllMedals}
+              onDeleteCountry={handleDeleteCountry}
             />)}
         </div>
-          <NewCountry onAddCountry = {this.handleAddCountry}/>
+          <NewCountry onAddCountry = {handleAddCountry}/>
       </div>
     );
-  }
 }
 
 export default App;
