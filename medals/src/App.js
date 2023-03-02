@@ -10,7 +10,8 @@ const App = () => {
 
   const [countries, setCountries] = useState([]);
   const [totalMedalsCount, setTotalMedalsCount] = useState(0);
-  const apiBaseEndpoint = "https://medals-api-kvang36.azurewebsites.net/api/country"
+  // const apiBaseEndpoint = "https://medals-api-kvang36.azurewebsites.net/api/country"
+  const apiBaseEndpoint = "https://localhost:5001/api/country";
 
 
   // Hardcoded Data locally
@@ -40,50 +41,54 @@ const App = () => {
 
 
   const handleAdd = (countryId, medalType) => {
-    
-    let countryIndex = countries.findIndex(country => country.id === countryId);
-
-    switch (medalType) {
-      case "Gold":
-        countries[countryIndex].gold++;
-        break;
-      case "Silver":
-        countries[countryIndex].silver++;
-        break;
-      case "Bronze":
-        countries[countryIndex].bronze++;
-        break;
-      default:
-        console.log("Medals didn't change");
-    }
-
-    setCountries(countries);
-    calcAllCountriesMedals();
+    handleUpdate(countryId, medalType, 1);
 
   }
 
   const handleMinus = (countryId, medalType) => {
+    handleUpdate(countryId, medalType, -1);
+  }
 
-    let countryIndex = countries.findIndex(country => country.id === countryId);
+  const handleUpdate = async (countryId, medalType, change) => {
+
+    let originalCountries = countries;
+    let mutableCountries = [...countries ];
+
+    let countryIndex = mutableCountries.findIndex(country => country.id === countryId);
 
     switch (medalType) {
       case "Gold":
-        countries[countryIndex].gold--;
+        mutableCountries[countryIndex].gold += (1 * change);
         break;
       case "Silver":
-        countries[countryIndex].silver--;
+        mutableCountries[countryIndex].silver += (1 * change);
         break;
       case "Bronze":
-        countries[countryIndex].bronze--;
+        mutableCountries[countryIndex].bronze += (1 * change);
         break;
       default:
         console.log("Medals didn't change");
     }
 
-    setCountries(countries);
+    setCountries(mutableCountries);
     calcAllCountriesMedals();
-  }
 
+    let medalToUpdate = medalType.toLowerCase();
+
+    const jsonPatch = [{ op: "replace", path: medalToUpdate, value: mutableCountries[countryIndex][medalToUpdate]}];
+
+    try {
+      await axios.patch(`${apiBaseEndpoint}/${countryId}`, jsonPatch);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404) {
+        // country already deleted
+        console.log("The record does not exist - it may have already been deleted");
+      } else { 
+        alert('An error occurred while updating');
+        setCountries(originalCountries);
+      }
+    }
+  }
 
   const calcAllCountriesMedals = () => {
     let allCountriesMedals = 0;
@@ -93,16 +98,35 @@ const App = () => {
     setTotalMedalsCount(allCountriesMedals);
   }
 
-  const stripAllMedals = (countryId) => {
+  const stripAllMedals = async(countryId) => {
 
-    let countryLocated = countries.findIndex(country => country.id === countryId);
+    let originalCountries = countries;
+    let mutableCountries = [...countries ];
 
-    countries[countryLocated].gold = 0;
-    countries[countryLocated].silver = 0;
-    countries[countryLocated].bronze = 0;
+    let countryLocated = mutableCountries.findIndex(country => country.id === countryId);
 
-   setCountries(countries);
+    mutableCountries[countryLocated].gold = 0;
+    mutableCountries[countryLocated].silver = 0;
+    mutableCountries[countryLocated].bronze = 0;
+
+   setCountries(mutableCountries);
    calcAllCountriesMedals();
+
+   console.log(mutableCountries[countryLocated]);
+
+  //  const jsonPatch = [{ op: "replace", path: '', value: 0}];
+
+   try {
+    await axios.patch(`${apiBaseEndpoint}/${countryId}`);
+  } catch (ex) {
+    if (ex.response && ex.response.status === 404) {
+      // country already deleted
+      console.log("The record does not exist - it may have already been deleted");
+    } else { 
+      alert('An error occurred while updating');
+      setCountries(originalCountries);
+    }
+  }
     
   }
 
