@@ -1,6 +1,7 @@
 // import { Component } from 'react';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import axios from 'axios';
+import { HubConnectionBuilder } from '@microsoft/signalr';
 import { Badge } from '@mui/material';
 import './App.css';
 import Country from './components/Country';
@@ -9,10 +10,19 @@ import NewCountry from './components/NewCountry';
 const App = () => {
 
   const [countries, setCountries] = useState([]);
+  const [ connection, setConnection] = useState(null);
   const [totalMedalsCount, setTotalMedalsCount] = useState(0);
-  // const apiBaseEndpoint = "https://medals-api-kvang36.azurewebsites.net/api/country"
-  const apiBaseEndpoint = "https://localhost:5001/api/country";
 
+  const apiBaseEndpoint = "https://medals-api-kvang36.azurewebsites.net/api/country"
+  const hubEndpoint = "https://medalsapi.azurewebsites.net/medalsHub"
+  // const apiBaseEndpoint = "https://localhost:5001/api/country";
+  // const hubEndpoint = "https://localhost:5001/medalsHub"
+
+
+  const latestCountries = useRef(null);
+  // latestCountries.current is a ref variable to countries
+  // this is needed to access state variable in useEffect w/o dependency
+  latestCountries.current = countries;
 
   // Hardcoded Data locally
   // useEffect(() => {
@@ -32,7 +42,56 @@ const App = () => {
     }
 
     fetchData();
+
+    // signalR
+    const newConnection = new HubConnectionBuilder()
+      .withUrl(hubEndpoint)
+      .withAutomaticReconnect()
+      .build();
+
+    setConnection(newConnection);
+
   }, []);
+
+  // componentDidUpdate (changes to connection)
+  useEffect(() => {
+    if (connection) {
+      connection.start()
+      .then(() => {
+        console.log('Connected!')
+
+        connection.on('ReceiveAddMessage', country => {
+          console.log(`Add: ${country.name}`);
+
+          let mutableCountries = [...latestCountries.current];
+          mutableCountries = mutableCountries.concat(country);
+
+          setCountries(mutableCountries);
+        });
+
+        connection.on('ReceiveDeleteMessage', id => {
+          console.log(`Delete id: ${id}`);
+
+          let mutableCountries = [...latestCountries.current];
+          mutableCountries = mutableCountries.filter(c => c.id !== id);
+
+          setCountries(mutableCountries);
+        });
+
+        connection.on('ReceivePatchMessage', country => {
+          console.log(`Patch: ${country.name}`);
+
+          let mutableCountries = [...latestCountries.current];
+          const idx = mutableCountries.findIndex(c => c.id === country.id);
+          mutableCountries[idx] = country;
+
+          setCountries(mutableCountries);
+        });
+      })
+      .catch(e => console.log('Connection failed: ', e));
+    }
+  // useEffect is dependent on changes connection
+  }, [connection]);
 
   useEffect(() => {
     calcAllCountriesMedals();
@@ -114,10 +173,12 @@ const App = () => {
 
    console.log(mutableCountries[countryLocated]);
 
-  //  const jsonPatch = [{ op: "replace", path: '', value: 0}];
+   const jsonPatch = [{ op: "replace", path: 'gold', value: 0}, 
+                      { op: "replace", path: 'silver', value: 0}, 
+                      { op: "replace", path: 'bronze', value: 0}];
 
    try {
-    await axios.patch(`${apiBaseEndpoint}/${countryId}`);
+    await axios.patch(`${apiBaseEndpoint}/stripAll/${countryId}`, jsonPatch);
   } catch (ex) {
     if (ex.response && ex.response.status === 404) {
       // country already deleted
@@ -148,8 +209,9 @@ const App = () => {
     const foundExistingCountry = countries.find(country => country.name.toUpperCase() === newCountryName.toUpperCase());
 
     if(foundExistingCountry == null){
-      const { data: post } = await axios.post(apiBaseEndpoint, { name: newCountryName, gold: 0, silver: 0, bronze: 0});
-      setCountries(countries.concat(post));
+      // const { data: post } = await axios.post(apiBaseEndpoint, { name: newCountryName, gold: 0, silver: 0, bronze: 0});
+      // setCountries(countries.concat(post));
+      await axios.post(apiBaseEndpoint, { name: newCountryName, gold: 0, silver: 0, bronze: 0});
     }
     else{
         alert("Country already exists. Enter a new country.");
