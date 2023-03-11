@@ -14,7 +14,7 @@ const App = () => {
   const [totalMedalsCount, setTotalMedalsCount] = useState(0);
 
   const apiBaseEndpoint = "https://medals-api-kvang36.azurewebsites.net/api/country"
-  const hubEndpoint = "https://medalsapi.azurewebsites.net/medalsHub"
+  const hubEndpoint = "https://medals-api-kvang36.azurewebsites.net/medalsHub"
   // const apiBaseEndpoint = "https://localhost:5001/api/country";
   // const hubEndpoint = "https://localhost:5001/medalsHub"
 
