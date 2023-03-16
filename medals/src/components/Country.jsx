@@ -12,7 +12,7 @@ const Country = (props) => {
             padding: "5px"
         }
 
-        const { id, name, gold, silver, bronze, onAdd, onMinus, onStripMedals, onDeleteCountry } = props;
+        const { id, name, gold, silver, bronze, onAdd, onMinus, onStripMedals, onDeleteCountry, canDelete, canPatch } = props;
 
         return (
             <Card variant="outlined" style={myStyle} >
@@ -26,7 +26,7 @@ const Country = (props) => {
                         >
                             <strong>{name} <EmojiEventsIcon /></strong>
                         </Badge>
-                            <IconButton color="error" size="small" onClick={() => onDeleteCountry(id)}><Delete /></IconButton>
+                        { canDelete && <IconButton color="error" size="small" onClick={() => onDeleteCountry(id)}><Delete /></IconButton>}
                     </div>
                     <Divider />
                     <Medal
@@ -34,6 +34,7 @@ const Country = (props) => {
                         medalCount={gold}
                         medalType={"Gold"}
                         medalColor={"gold"}
+                        canPatch={ canPatch }
                         onAdd={onAdd}
                         onMinus={onMinus}
                     />
@@ -42,6 +43,7 @@ const Country = (props) => {
                         medalCount={silver}
                         medalType={"Silver"}
                         medalColor={"#adb5bd"}
+                        canPatch={ canPatch }
                         onAdd={onAdd}
                         onMinus={onMinus}
                     />
@@ -50,6 +52,7 @@ const Country = (props) => {
                         medalCount={bronze}
                         medalType={"Bronze"}
                         medalColor={"#cb8c47"}
+                        canPatch={ canPatch }
                         onAdd={onAdd}
                         onMinus={onMinus}
                     />
